@@ -1,22 +1,53 @@
 from __future__ import unicode_literals
 from hazm import *
 import os
+import json 
 
-path = r"D:/InformationRetrievalProject/txtfiles"
+BASE_PATH = "D:/InformationRetrievalProject"
+path = BASE_PATH + "/txtfiles"
 os.chdir(path)
-normalizer = Normalizer()
 
-def read_files(file_path):
-   with open(file_path, 'r', encoding="utf-8") as file:
-      normalize = normalizer.normalize(file.read())
-      tokenize = word_tokenize(normalize)
-      print(tokenize)
+invertedIndex_dict = {}
 
+
+def updateInvertedIndex(list, docId):
+    for i in list:
+        invertedIndex_dict[i] = docId
+
+def omitStopWordsAndElims(list):
+    modifiedList = []
+    stopWords = open(f"{BASE_PATH}/project_files/stop.txt", "r", encoding="utf-8").read()
+    elims = open(f"{BASE_PATH}/project_files/elim.txt", "r", encoding="utf-8").read()
+    for i in list:
+        if i not in stopWords and i not in elims:
+            modifiedList.append(i)
+    return modifiedList
+
+
+def lemmatize(tokenList):
+    lemmatizer = Lemmatizer()
+    lemmatizeList = []
+    for word in tokenList:
+        lemmatizeList.append(lemmatizer.lemmatize(word))
+    return lemmatizeList
+
+  
+
+      
 for file in os.listdir():
+    docId = file.removesuffix(".txt")
     file_path =f"{path}/{file}"
+    with open(file_path, 'r', encoding="utf-8") as file:
+        normalizer = Normalizer()
+        stemmer = Stemmer()
+        normalize = normalizer.normalize(file.read())
+        stem = stemmer.stem(normalize)
+        tokenize = word_tokenize(stem)
+        lemmatizeList = lemmatize(tokenize)
+        updateInvertedIndex(omitStopWordsAndElims(lemmatizeList), docId)
+  
 
-read_files(file_path)
-
+print(invertedIndex_dict)
 
 
   
