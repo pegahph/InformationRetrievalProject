@@ -2,6 +2,8 @@ from __future__ import unicode_literals
 from hazm import *
 import os
 import json 
+import requests
+import webbrowser
 
 BASE_PATH = "D:/InformationRetrievalProject"
 path = BASE_PATH + "/txtfiles"
@@ -47,7 +49,8 @@ for file in os.listdir():
         updateInvertedIndex(omitStopWordsAndElims(lemmatizeList), docId)
   
 
-print(invertedIndex_dict)
+# print(invertedIndex_dict)
+response = requests.post("http://127.0.0.1:5000", json = {'invertedIndex': invertedIndex_dict})
 
-
+webbrowser.get('windows-default').open('file://' + BASE_PATH + '/index.html')
   
