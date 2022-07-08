@@ -6,13 +6,14 @@
     <title>Document</title>
 </head>
 <body>
-    <h1>Hello</h1>
-    <div id="invertedList"></div>
+    <pre id="invertedList"></pre>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
+        const invertedList = document.getElementById('invertedList')
+        invertedList.innerHTML = "Loading ..."
         axios.get('http://127.0.0.1:5000').then(response => {
             const data = JSON.parse(response.data);
-            document.getElementById('invertedList').innerHTML = data
+            invertedList.innerHTML = JSON.stringify(data,undefined,2)
         })
     </script>
 </body>

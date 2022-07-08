@@ -14,7 +14,11 @@ invertedIndex_dict = {}
 
 def updateInvertedIndex(list, docId):
     for i in list:
-        invertedIndex_dict[i] = docId
+        if i in invertedIndex_dict.keys():
+            if docId not in invertedIndex_dict[i]:                
+                invertedIndex_dict[i].append(docId)
+        else:
+            invertedIndex_dict[i] = [docId]
 
 def omitStopWordsAndElims(list):
     modifiedList = []
@@ -47,10 +51,8 @@ for file in os.listdir():
         tokenize = word_tokenize(stem)
         lemmatizeList = lemmatize(tokenize)
         updateInvertedIndex(omitStopWordsAndElims(lemmatizeList), docId)
-  
 
-# print(invertedIndex_dict)
-response = requests.post("http://127.0.0.1:5000", json = {'invertedIndex': invertedIndex_dict})
+response = requests.post("http://127.0.0.1:5000", json = {'invertedIndex': json.dumps(invertedIndex_dict)})
 
 webbrowser.get('windows-default').open('file://' + BASE_PATH + '/index.html')
   
