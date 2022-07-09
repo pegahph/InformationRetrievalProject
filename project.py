@@ -5,11 +5,12 @@ import json
 import requests
 import webbrowser
 
-BASE_PATH = "D:/InformationRetrievalProject"
+BASE_PATH = os.path.abspath(os.getcwd())
 path = BASE_PATH + "/txtfiles"
 os.chdir(path)
 
 invertedIndex_dict = {}
+
 
 
 def updateInvertedIndex(list, docId):
