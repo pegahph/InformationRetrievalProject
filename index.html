@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- <pre id="invertedList"></pre> -->
     <div class="search-box">
         <img src="./media/SNOOGLE.svg" alt="snoogle-logo">
         <div class="search-input-container">
@@ -21,6 +20,7 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
+<<<<<<< HEAD
         const invertedList = document.getElementById('invertedList');
         invertedList.innerHTML = "Loading ...";
         axios.get('http://127.0.0.1:5000').then(response => {
@@ -29,7 +29,15 @@
         });
         document.getElementsByClassName("search-btn")[0].addEventListener("click", () => {
             const query = document.getElementsByClassName("search-input")[0].value;
+=======
+        axios.get('http://127.0.0.1:5000').then(response => {
+            const data = JSON.parse(response.data);
+            console.log(data);
+>>>>>>> 13094ac1ed0ee11a3c2ed8fd4dd44f4294a7c74b
         })
+        // axios.post('http://127.0.0.1:5000/search', {query: "است"}).then(response => {
+        //     console.log(response.data);
+        // })
     </script>
 </body>
 </html>
