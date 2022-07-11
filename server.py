@@ -13,11 +13,16 @@ def getInvertedIndex():
 @app.route('/', methods=["POST"])
 def setInvertedIndex():
     invertedIndex['data'] = request.get_json(force=True)['invertedIndex'] 
+    return "success"
 
 @app.route('/search', methods=["POST"])
 def searchQuery():
     query= request.get_json(force=True)['query']
-    return "success"
+    try:
+        postingList = json.loads(invertedIndex['data'])[query]
+        return jsonify({"docs": postingList})
+    except:
+        return "Term not found!"
 
 if __name__ == '__main__':
     app.run()  # run our Flask app
