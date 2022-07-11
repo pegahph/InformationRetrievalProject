@@ -17,14 +17,18 @@
             </svg>
             <input type="text" class="search-input" placeholder="عبارت جستجوی خود را وارد کنید"/>
         </div>
+        <input class="search-btn" type="button" value="جستجو کن"/>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
-        const invertedList = document.getElementById('invertedList')
-        invertedList.innerHTML = "Loading ..."
+        const invertedList = document.getElementById('invertedList');
+        invertedList.innerHTML = "Loading ...";
         axios.get('http://127.0.0.1:5000').then(response => {
             const data = JSON.parse(response.data);
-            invertedList.innerHTML = JSON.stringify(data,undefined,2)
+            invertedList.innerHTML = JSON.stringify(data,undefined,2);
+        });
+        document.getElementsByClassName("search-btn")[0].addEventListener("click", () => {
+            const query = document.getElementsByClassName("search-input")[0].value;
         })
     </script>
 </body>
