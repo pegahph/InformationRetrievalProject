@@ -14,5 +14,10 @@ def getInvertedIndex():
 def setInvertedIndex():
     invertedIndex['data'] = request.get_json(force=True)['invertedIndex'] 
 
+@app.route('/search', methods=["POST"])
+def searchQuery():
+    query= request.get_json(force=True)['query']
+    return "success"
+
 if __name__ == '__main__':
     app.run()  # run our Flask app

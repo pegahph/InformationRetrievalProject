@@ -23,9 +23,9 @@
             const data = JSON.parse(response.data);
             console.log(data);
         })
-        // axios.post('http://127.0.0.1:5000/search', {query: "است"}).then(response => {
-        //     console.log(response.data);
-        // })
+        axios.post('http://127.0.0.1:5000/search', {query: "است"}).then(response => {
+            console.log(response.data);
+        })
     </script>
 </body>
 </html>
