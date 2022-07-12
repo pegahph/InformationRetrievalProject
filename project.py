@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+from pickle import APPEND
 from hazm import *
 import os, sys, time
 import json 
@@ -7,6 +8,7 @@ import webbrowser
 from os.path import exists
 import glob
 from subprocess import call
+from unidecode import unidecode
 
 BASE_PATH = os.path.abspath(os.getcwd())
 
@@ -28,6 +30,8 @@ def omitStopWordsAndElims(list):
     stopWords = open(f"{BASE_PATH}/project_files/stop.txt", "r", encoding="utf-8").read()
     elims = open(f"{BASE_PATH}/project_files/elim.txt", "r", encoding="utf-8").read()
     for i in list:
+        if i.isnumeric()== True :
+            modifiedList.append(unidecode(i))
         if i not in stopWords and i not in elims:
             modifiedList.append(i)
     return modifiedList
@@ -57,6 +61,7 @@ else:
     path = BASE_PATH + "/txtfiles"
     os.chdir(path)
     for file in os.listdir():
+        # docId = int(file.replace(".txt",""))
         docId = int(file.removesuffix(".txt"))
         file_path =f"{path}/{file}"
         with open(file_path, 'r', encoding="utf-8") as file:
@@ -68,21 +73,23 @@ else:
             lemmatizeList = lemmatize(tokenize)
             updateInvertedIndex(omitStopWordsAndElims(lemmatizeList), docId)
 
+    response = requests.post("http://127.0.0.1:5000", json = {'invertedIndex': json.dumps(invertedIndex_dict)})
+
     os.chdir(BASE_PATH)
     f = open("INVERTED-INDEX.txt", "x")
     f = open("INVERTED-INDEX.txt", "w")
     f.write(json.dumps(invertedIndex_dict))
     f.close()
 
-    response = requests.post("http://127.0.0.1:5000", json = {'invertedIndex': json.dumps(invertedIndex_dict)})
 
+
+webbrowser.get('windows-default').open('file://' + BASE_PATH + '/index.html')
 
 folder_path = f"{BASE_PATH}/txtfiles"
 file_type = r'/*.txt'
 files = glob.glob(folder_path + file_type)
 last_file = max(files, key=os.path.getctime)
 
-webbrowser.get('windows-default').open('file://' + BASE_PATH + '/index.html')
 
 try:
     while True:
