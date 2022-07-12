@@ -14,8 +14,6 @@ BASE_PATH = os.path.abspath(os.getcwd())
 
 invertedIndex_dict = {}
 
-
-
 def updateInvertedIndex(list, docId):
     for i in list:
         if i in invertedIndex_dict.keys():
@@ -44,7 +42,7 @@ def lemmatize(tokenList):
         lemmatizeList.append(lemmatizer.lemmatize(word))
     return lemmatizeList
    
-def tokenizeAndCreateInvertedIndex(file):
+def tokenizeAndCreateInvertedIndex(file, docId):
     normalizer = Normalizer()
     stemmer = Stemmer()
     normalize = normalizer.normalize(file.read())
@@ -52,6 +50,16 @@ def tokenizeAndCreateInvertedIndex(file):
     tokenize = word_tokenize(stem)
     lemmatizeList = lemmatize(tokenize)
     updateInvertedIndex(omitStopWordsAndElims(lemmatizeList), docId)
+
+def writeInvertedIndex():
+    response = requests.post("http://127.0.0.1:5000", json = {'invertedIndex': json.dumps(invertedIndex_dict)}) 
+    os.chdir(BASE_PATH)
+    file_exists = exists("INVERTED-INDEX.txt")
+    if not file_exists:
+        f = open("INVERTED-INDEX.txt", "x")
+    f = open("INVERTED-INDEX.txt", "w")
+    f.write(json.dumps(invertedIndex_dict))
+    f.close()
 
 os.chdir(BASE_PATH)
 file_exists = exists("INVERTED-INDEX.txt")
@@ -65,21 +73,8 @@ else:
         docId = int(file.removesuffix(".txt"))
         file_path =f"{path}/{file}"
         with open(file_path, 'r', encoding="utf-8") as file:
-            normalizer = Normalizer()
-            stemmer = Stemmer()
-            normalize = normalizer.normalize(file.read())
-            stem = stemmer.stem(normalize)
-            tokenize = word_tokenize(stem)
-            lemmatizeList = lemmatize(tokenize)
-            updateInvertedIndex(omitStopWordsAndElims(lemmatizeList), docId)
-
-    response = requests.post("http://127.0.0.1:5000", json = {'invertedIndex': json.dumps(invertedIndex_dict)})
-
-    os.chdir(BASE_PATH)
-    f = open("INVERTED-INDEX.txt", "x")
-    f = open("INVERTED-INDEX.txt", "w")
-    f.write(json.dumps(invertedIndex_dict))
-    f.close()
+           tokenizeAndCreateInvertedIndex(file, docId)
+    writeInvertedIndex()
 
 
 
@@ -89,15 +84,17 @@ folder_path = f"{BASE_PATH}/txtfiles"
 file_type = r'/*.txt'
 files = glob.glob(folder_path + file_type)
 last_file = max(files, key=os.path.getctime)
-
-
+print("The project is running and waiting for updates...")
 try:
     while True:
         files = glob.glob(folder_path + file_type)
         max_file = max(files, key=os.path.getctime)
         if last_file != max_file :
             last_file = max_file
-            print("inverted index should be update")
+            file = last_file.removeprefix(folder_path)
+            docId = int(file[1:].removesuffix(".txt"))
+            tokenizeAndCreateInvertedIndex(open(last_file, 'r', encoding="utf-8"), docId)
+            writeInvertedIndex()
         time.sleep(4)
 
 except KeyboardInterrupt:
