@@ -21,6 +21,7 @@ def updateInvertedIndex(list, docId):
                 invertedIndex_dict[i].append(docId)
         else:
             invertedIndex_dict[i] = [docId]
+        invertedIndex_dict[i].sort()
 
 def omitStopWordsAndElims(list):
     modifiedList = []
@@ -45,8 +46,12 @@ def lemmatize(tokenList):
 
       
 for file in os.listdir():
+<<<<<<< HEAD
     docId = file.replace(".txt","")
     # docId = file.removesuffix(".txt")
+=======
+    docId = int(file.removesuffix(".txt"))
+>>>>>>> 5b4b6ff0585d641901999e06d02c5dab23b132ae
     file_path =f"{path}/{file}"
     with open(file_path, 'r', encoding="utf-8") as file:
         normalizer = Normalizer()
@@ -56,6 +61,7 @@ for file in os.listdir():
         tokenize = word_tokenize(stem)
         lemmatizeList = lemmatize(tokenize)
         updateInvertedIndex(omitStopWordsAndElims(lemmatizeList), docId)
+
 
 response = requests.post("http://127.0.0.1:5000", json = {'invertedIndex': json.dumps(invertedIndex_dict)})
 webbrowser.get('chrome').open('file://' + BASE_PATH + '/index.html')
