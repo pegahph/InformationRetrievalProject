@@ -1,10 +1,11 @@
 from __future__ import unicode_literals
+from pickle import APPEND
 from hazm import *
 import os
 import json 
 import requests
 import webbrowser
-
+from unidecode import unidecode
 BASE_PATH = os.path.abspath(os.getcwd())
 path = BASE_PATH + "/txtfiles"
 os.chdir(path)
@@ -26,6 +27,8 @@ def omitStopWordsAndElims(list):
     stopWords = open(f"{BASE_PATH}/project_files/stop.txt", "r", encoding="utf-8").read()
     elims = open(f"{BASE_PATH}/project_files/elim.txt", "r", encoding="utf-8").read()
     for i in list:
+        if i.isnumeric()== True :
+            modifiedList.append(unidecode(i))
         if i not in stopWords and i not in elims:
             modifiedList.append(i)
     return modifiedList
@@ -42,7 +45,8 @@ def lemmatize(tokenList):
 
       
 for file in os.listdir():
-    docId = file.removesuffix(".txt")
+    docId = file.replace(".txt","")
+    # docId = file.removesuffix(".txt")
     file_path =f"{path}/{file}"
     with open(file_path, 'r', encoding="utf-8") as file:
         normalizer = Normalizer()
@@ -54,6 +58,6 @@ for file in os.listdir():
         updateInvertedIndex(omitStopWordsAndElims(lemmatizeList), docId)
 
 response = requests.post("http://127.0.0.1:5000", json = {'invertedIndex': json.dumps(invertedIndex_dict)})
-
-webbrowser.get('windows-default').open('file://' + BASE_PATH + '/index.html')
+webbrowser.get('chrome').open('file://' + BASE_PATH + '/index.html')
+# webbrowser.get('windows-default').open('file://' + BASE_PATH + '/index.html')
   
