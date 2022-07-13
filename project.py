@@ -13,6 +13,7 @@ from unidecode import unidecode
 BASE_PATH = os.path.abspath(os.getcwd())
 
 invertedIndex_dict = {}
+documents = {}
 
 def updateInvertedIndex(list, docId):
     for i in list:
@@ -61,21 +62,47 @@ def writeInvertedIndex():
     f.write(json.dumps(invertedIndex_dict))
     f.close()
 
+def createListOfDocuments():
+    path = BASE_PATH + "/txtfiles"
+    os.chdir(path)
+    availableId= 0
+    for file in os.listdir():
+        documents.append({"file": file, "docId": availableId})
+        availableId += 1
+    os.chdir(BASE_PATH)
+    file_exists = exists("DOCUMENTS-LIST.txt")
+    if not file_exists:
+        f = open("DOCUMENTS-LIST.txt", "x")
+    f = open("DOCUMENTS-LIST.txt", "w")
+    f.write(json.dumps(documents))
+    f.close()
+
 os.chdir(BASE_PATH)
 file_exists = exists("INVERTED-INDEX.txt")
 if file_exists:
+    documents = json.loads(open(f"{BASE_PATH}/DOCUMENTS-LIST.txt", "r", encoding="utf-8").read())
+    invertedIndex_dict = json.loads(open(f"{BASE_PATH}/INVERTED-INDEX.txt", "r", encoding="utf-8").read())
     pass
 else:
     path = BASE_PATH + "/txtfiles"
     os.chdir(path)
+    availableId= 0
     for file in os.listdir():
         # docId = int(file.replace(".txt",""))
-        docId = int(file.removesuffix(".txt"))
+        docId = availableId
+        documents[file] = availableId
+        availableId += 1
         file_path =f"{path}/{file}"
         with open(file_path, 'r', encoding="utf-8") as file:
            tokenizeAndCreateInvertedIndex(file, docId)
     writeInvertedIndex()
-
+    os.chdir(BASE_PATH)
+    file_exists = exists("DOCUMENTS-LIST.txt")
+    if not file_exists:
+        f = open("DOCUMENTS-LIST.txt", "x")
+    f = open("DOCUMENTS-LIST.txt", "w")
+    f.write(json.dumps(documents))
+    f.close()
 
 
 webbrowser.get('windows-default').open('file://' + BASE_PATH + '/index.html')
@@ -85,17 +112,24 @@ file_type = r'/*.txt'
 files = glob.glob(folder_path + file_type)
 last_file = max(files, key=os.path.getctime)
 print("The project is running and waiting for updates...")
+
 try:
     while True:
         files = glob.glob(folder_path + file_type)
         max_file = max(files, key=os.path.getctime)
         if last_file != max_file :
             last_file = max_file
-            file = last_file.removeprefix(folder_path)
-            docId = int(file[1:].removesuffix(".txt"))
-            tokenizeAndCreateInvertedIndex(open(last_file, 'r', encoding="utf-8"), docId)
-            writeInvertedIndex()
-        time.sleep(4)
+            file = last_file.removeprefix(folder_path)[1:]
+            if file not in documents:
+                docId = documents[list(documents)[-1]] + 1
+                documents[file] = docId
+                f = open("DOCUMENTS-LIST.txt", "w")
+                f.write(json.dumps(documents))
+                f.close()
+                time.sleep(4)
+                tokenizeAndCreateInvertedIndex(open(last_file, 'r', encoding="utf-8"), docId)
+                writeInvertedIndex()
+        time.sleep(3)
 
 except KeyboardInterrupt:
     pass
