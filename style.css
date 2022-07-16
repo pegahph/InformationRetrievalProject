@@ -70,7 +70,7 @@ html {
 body {
   direction: rtl;
   background-color: #f2f6f885;
-  overflow: hidden;
+  overflow-x: hidden;
 }
 .page-container {
   display: flex;

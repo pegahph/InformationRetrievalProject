@@ -45,9 +45,10 @@
             const resultsDiv = document.getElementsByClassName("results-box")[0];    
             while (resultsDiv.firstChild)
                 resultsDiv.removeChild(resultsDiv.firstChild);
-            if(response == "Term not found!")
+            if(response == "Term not found!"){
                 resultsDiv.appendChild(document.createTextNode("متأسفانه سندی با این کلیدواژه پیدا نشد"));
-            for(var i = 0; response.docs[i]; i++){
+            }
+            for(var i = 0; i < response.docs.length; i++){
                 const title = addElement(null,"h1",[["class","title"]],"سند شماره "+response.docs[i]);
                 const link = addElement([title],"a",[["class","doc-link"],["href","./txtfiles/" + response.docs[i] + ".txt"],["target","_blank"]], null);
                 const result = addElement([link],"div",[["class","result"]],null);
